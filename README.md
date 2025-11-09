@@ -1,5 +1,12 @@
 # Projeto de Rastreamento de Pátio Mottu (IoT, Java & Oracle)
 
+## 👥 Integrantes do Grupo
+
+- **Guilherme Jardim** (RM556814)
+- **Fernando Fontes** (RM555317)
+
+---
+
 Este projeto demonstra uma solução de ponta-a-ponta para o rastreamento de motocicletas em um pátio, utilizando uma arquitetura distribuída que integra IoT (Wokwi), um middleware serverless (Node.js) e um backend robusto (Java/Spring Boot) conectado a um banco de dados Oracle com lógica de negócios embarcada (PL/SQL).
 
 ## 🚀 Visão Geral da Arquitetura (Fluxo de Dados)
@@ -37,19 +44,18 @@ O fluxo de dados é projetado para ser assíncrono e resiliente, garantindo que 
 
 ### 3. Backend (Java/Spring Boot - `motolocation-java/`)
 
-- **Arquivos Principais:** `MovimentacaoApiController.java`, `MovimentacaoService.java`, `SecurityConfig.java`
+- **Arquivos Principais:** `MovimentacaoService.java`, `SecurityConfig.java`
 - **Função:** O cérebro da lógica de negócio e o proprietário dos dados.
 - **Ação:**
   1.  `SecurityConfig.java`: Protege o endpoint `/api/movimentacoes` e exige um header `X-API-KEY` válido (validado pelo `ApiKeyAuthFilter`).
-  2.  `MovimentacaoApiController.java`: Recebe o `POST` da "ponte" Node.js.
-  3.  `MovimentacaoService.java`: **Não usa JpaRepository para escrever**. Em vez disso, usa o `EntityManager` para chamar a procedure do Oracle:
+  2.  `MovimentacaoService.java`: **Não usa JpaRepository para escrever**. Em vez disso, usa o `EntityManager` para chamar a procedure do Oracle:
       ```java
       StoredProcedureQuery query = em.createStoredProcedureQuery("PKG_MOVIMENTACAO.sp_registrar_movimentacao");
       query.setParameter("p_rfid_tag", rfid);
       query.setParameter("p_sensor_codigo", sensorCodigo);
       query.execute();
       ```
-  4.  **Banco (Oracle):** A procedure `sp_registrar_movimentacao` (escrita em PL/SQL) faz as validações de negócio (`Moto não encontrada`, `Sensor não encontrado`, `Moto não está Ativa`) e, se tudo estiver OK, insere na tabela `MOVIMENTACAO`.
+  3.  **Banco (Oracle):** A procedure `sp_registrar_movimentacao` (escrita em PL/SQL) faz as validações de negócio (`Moto não encontrada`, `Sensor não encontrado`, `Moto não está Ativa`) e, se tudo estiver OK, insere na tabela `MOVIMENTACAO`.
 
 ---
 
